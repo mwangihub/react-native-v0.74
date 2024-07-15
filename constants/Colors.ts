@@ -5,6 +5,8 @@
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
+// const themedColorDark = 'rgb(8, 126, 164)';
+// const themedColorLight = 'rgb(8, 126, 164)';
 
 export const Colors = {
   light: {

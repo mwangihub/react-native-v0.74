@@ -1,25 +1,40 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet, useColorScheme } from 'react-native';
+import { StyleSheet, useColorScheme, Image } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedRef,
   useAnimatedStyle,
   useScrollViewOffset,
 } from 'react-native-reanimated';
-
+import { Link, useNavigation } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
+import { View } from 'react-native';
+
 
 const HEADER_HEIGHT = 250;
 
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
+  headerBackgroundColor: { light: string, dark: string };
 }>;
+
+
+const DefaultHeaderImage = () => (
+  < Ionicons size={310} name="code-slash" style={styles.headerImage} />
+);
+
+
+const ALTDefaultHeaderImage = () => (
+  <></>
+);
+
 
 export default function ParallaxScrollView({
   children,
-  headerImage,
-  headerBackgroundColor,
+  headerImage = <ALTDefaultHeaderImage />,
+  headerBackgroundColor = { light: 'rgb(8, 126, 164)', dark: '#1D3D47' },
 }: Props) {
   const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -57,9 +72,16 @@ export default function ParallaxScrollView({
       </Animated.ScrollView>
     </ThemedView>
   );
-}
+};
+
 
 const styles = StyleSheet.create({
+  headerImage: {
+    color: '#808080',
+    bottom: -90,
+    left: -35,
+    position: 'absolute',
+  },
   container: {
     flex: 1,
   },
@@ -73,4 +95,20 @@ const styles = StyleSheet.create({
     gap: 16,
     overflow: 'hidden',
   },
+  reactLogo: {
+    height: 200,
+    width: 400,
+    bottom: 0,
+    left: -50,
+    right: 0,
+    position: 'absolute',
+  },
+
+  backArrow: {
+    position: 'absolute',
+    color: "#087EA4",
+    top: 60,
+    left: 40,
+    fontSize: 30,
+  }
 });
