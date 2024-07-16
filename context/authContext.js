@@ -1,7 +1,4 @@
-
-
-import { router } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
+import { getItemAsync, setItemAsync, deleteItemAsync } from 'expo-secure-store';
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Platform } from 'react-native';
 
@@ -20,46 +17,22 @@ export const useAuthContext = () => {
     return useContext(AuthContext);
 };
 
-/**
- * @summary 
- * - The AuthContext.Provider passes the signIn, signOut, session, 
- *   and isLoading values to its children, making them accessible 
- *   throughout the application.
- * - This approach ensures that the authentication state is consistent 
- *   and that session data persists across page reloads, while also 
- *   handling login and logout actions properly.
- * @mwangihub https://github.com/mwangihub
- * @param {*} props.children 
- * @returns 
- */
 export const AuthProvider = ({ children }) => {
     const [session, setSession] = useState(null);
     const [isLoading, setLoading] = useState(false);
 
     useEffect(() => {
-        // try {
-        //     localStorage.removeItem('session');
-
-        // } catch (error) {
-        //     SecureStore.deleteItemAsync("session");
-        // }
-
-        /**
-         * @summary 
-         * 
-         * @mwangihub https://github.com/mwangihub
-         * @param {*} object 
-         * @returns
-         */
-        setLoading(true);
         const checkSession = async () => {
+            setLoading(true);
             try {
+                let storedSession;
                 if (Platform.OS === 'web') {
-                    const storedSession = localStorage.getItem('session');
-                    if (storedSession) setSession(JSON.parse(storedSession));
+                    storedSession = localStorage.getItem('session');
                 } else {
-                    const storedSession = await SecureStore.getItemAsync("session");
-                    if (storedSession) setSession(JSON.parse(storedSession));
+                    storedSession = await getItemAsync('session');
+                }
+                if (storedSession) {
+                    setSession(JSON.parse(storedSession));
                 }
             } catch (e) {
                 console.error('Error retrieving session:', e);
@@ -69,56 +42,34 @@ export const AuthProvider = ({ children }) => {
         checkSession();
     }, []);
 
-
-    /**
-     * @summary 
-     * 
-     * @mwangihub https://github.com/mwangihub
-     * @param {*} object 
-     * @returns
-     */
-    const signIn = async (object = null) => {
-        console.log("Sign in data: ", object);
+    const signIn = async () => {
         setLoading(true);
-        setTimeout(async () => {
-            try {
-                if (Platform.OS === 'web') {
-                    localStorage.setItem('session', JSON.stringify(dummySession));
-                } else {
-                    await SecureStore.setItemAsync("session", JSON.stringify(dummySession));
-                }
-                setSession(dummySession);
-            } catch (e) {
-                console.error('Error setting session:', e);
+        try {
+            if (Platform.OS === 'web') {
+                localStorage.setItem('session', JSON.stringify(dummySession));
+            } else {
+                await setItemAsync('session', JSON.stringify(dummySession));
             }
-            setLoading(false);
-        }, 3000);
+            setSession(dummySession);
+        } catch (e) {
+            console.error('Error setting session:', e);
+        }
+        setLoading(false);
     };
 
-    /**
-     * @summary 
-     * 
-     * @mwangihub https://github.com/mwangihub
-     * @param {*} object 
-     * @returns
-     */
     const signOut = async () => {
         setLoading(true);
-
-        setTimeout(async () => {
-            try {
-                if (Platform.OS === 'web') {
-                    localStorage.removeItem('session');
-                } else {
-                    await SecureStore.deleteItemAsync("session");
-                }
-                setSession(null);
-            } catch (e) {
-                console.error('Error removing session:', e);
+        try {
+            if (Platform.OS === 'web') {
+                localStorage.removeItem('session');
+            } else {
+                await deleteItemAsync('session');
             }
-            setLoading(false);
-        }, 3000);
-
+            setSession(null);
+        } catch (e) {
+            console.error('Error removing session:', e);
+        }
+        setLoading(false);
     };
 
     return (
